@@ -1,0 +1,30 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Node 1",
+            "isSubmissionPosition": false,
+            "description": "This is node 1",
+            "tag": "tag1",
+            "index": 0
+        },
+        {
+            "id": "2",
+            "name": "Node 2",
+            "isSubmissionPosition": true,
+            "description": "This is node 2",
+            "tag": "tag2",
+            "index": 1
+        }
+    ],
+    "edges": [
+        {
+            "source": "1",
+            "target": "2",
+            "condition": "Condition 1",
+            "description": "This is edge from node 1 to node 2",
+            "weight": 1,
+            "tag": "edgeTag1"
+        }
+    ]
+}
