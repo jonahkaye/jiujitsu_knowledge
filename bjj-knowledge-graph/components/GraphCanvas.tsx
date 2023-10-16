@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { NodeData } from './NodeForm';
-import { EdgeData } from './EdgeForm';
+import { EdgeData, EdgeRawData } from './EdgeForm';
 
 function GraphCanvas() {
     const canvasRef = useRef<SVGSVGElement | null>(null);
@@ -14,14 +14,25 @@ function GraphCanvas() {
             fetch('/api/getAllEdges').then(response => response.json())
         ]).then(([nodesData, edgesData]) => {
             setNodes(nodesData);
-            const processedEdges = edgesData.map((edge: EdgeData) => ({
-                ...edge,
-                source: nodesData.find((node: NodeData) => node.id === edge.source),
-                target: nodesData.find((node: NodeData) => node.id === edge.target)
-            }));
-    
+            // Convert edges' source and target from ID strings to actual node references
+            const processedEdges = edgesData.map((edge: EdgeRawData) => {
+                const sourceNode = nodesData.find((node: NodeData) => node.id === edge.source);
+                const targetNode = nodesData.find((node: NodeData) => node.id === edge.target);
+            
+                if (!sourceNode || !targetNode) {
+                    console.error("Node not found for edge:", edge);
+                    return null;
+                }
+            
+                return {
+                    ...edge,
+                    source: sourceNode,
+                    target: targetNode
+                };
+            }).filter((edge: EdgeData) => edge !== null) as EdgeData[]; // filter out null values and assert as EdgeData[]
+            
             setLinks(processedEdges);
-
+            console.log(processedEdges)
         });
     }, []);
 
@@ -53,7 +64,7 @@ function GraphCanvas() {
             .style("stroke-width", "3px");
 
         node.style("fill", "#333")
-            .attr("r", 5); // set a radius
+            .attr("r", 10); // set a radius
         
 
          // Define the simulation
@@ -65,23 +76,25 @@ function GraphCanvas() {
             height = canvasRef.current.clientHeight;
         }
 
+        console.log("Setting up simulation with nodes:", nodes);
+        console.log("Setting up simulation with links:", links);
         const simulation = d3.forceSimulation(nodes)
-            .force('link', d3.forceLink(links))
+            .force('link', d3.forceLink<NodeData, EdgeData>(links).id((d: NodeData) => (d.id ? d.id.toString() : 'fallback_value')))
             .force('charge', d3.forceManyBody())
             .force('center', d3.forceCenter(width / 2, height / 2));
-            
-    
-        // Update the positions of the nodes and links on each "tick" of the simulation
-        simulation.on("tick", () => {
-            link
-                .attr("x1", (d: any) => d.source.x)
-                .attr("y1", (d: any) => d.source.y)
-                .attr("x2", (d: any) => d.target.x)
-                .attr("y2", (d: any) => d.target.y);
-    
-            node.attr("cx", (d: any) => d.x)
-                .attr("cy", (d: any) => d.y);
-        });
+
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", (d: EdgeData) => (d.source as NodeData).x || 0)
+                    .attr("y1", (d: EdgeData) => (d.source as NodeData).y || 0)
+                    .attr("x2", (d: EdgeData) => (d.target as NodeData).x || 0)
+                    .attr("y2", (d: EdgeData) => (d.target as NodeData).y || 0);
+                    
+                node
+                    .attr("cx", (d: NodeData) => d.x || 0)
+                    .attr("cy", (d: NodeData) => d.y || 0);
+                });
     
     }, [nodes, links]);
 

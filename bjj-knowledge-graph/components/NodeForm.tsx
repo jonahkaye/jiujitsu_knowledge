@@ -5,14 +5,19 @@ interface NodeFormProps {
     onSubmit: (nodeData: NodeData) => void;
 }
 
-export interface NodeData extends SimulationNodeDatum {
+export interface NodeData {
     id: string | number;
     name: string;
     isSubmissionPosition: boolean;
     description: string;
     tag?: string;
     index?: number;
+    x?: number;
+    y?: number;
+    vx?: number;
+    vy?: number;
 }
+
 
 export const NodeForm: React.FC<NodeFormProps> = ({ onSubmit }) => {
     const [id, setId] = useState<string>('');

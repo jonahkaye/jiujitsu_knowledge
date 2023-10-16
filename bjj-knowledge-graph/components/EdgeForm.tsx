@@ -2,14 +2,25 @@
 
 import React, { useState } from 'react';
 import { NodeData } from './NodeForm';
+import { SimulationNodeDatum } from 'd3';
+
 
 interface EdgeFormProps {
-    onSubmit: (edgeData: EdgeData) => void;
+    onSubmit: (edgeData: EdgeRawData) => void;
 }
 
-export interface EdgeData extends d3.SimulationNodeDatum {
-    source: string | NodeData;
-    target: string | NodeData;
+export interface EdgeRawData {
+    source: string;
+    target: string;
+    condition: string;
+    description: string;
+    weight?: number;
+    tag?: string;
+}
+
+export interface EdgeData extends SimulationNodeDatum {
+    source: NodeData;
+    target: NodeData;
     condition: string;
     description: string;
     weight?: number;
@@ -17,8 +28,8 @@ export interface EdgeData extends d3.SimulationNodeDatum {
 }
 
 export const EdgeForm: React.FC<EdgeFormProps> = ({ onSubmit }) => {
-    const [source, setSource] = useState<string | NodeData>(''); // renamed from startNodeId
-    const [target, setTarget] = useState<string | NodeData>(''); // renamed from endNodeId
+    const [source, setSource] = useState<string>(''); 
+    const [target, setTarget] = useState<string>(''); 
     const [condition, setCondition] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [weight, setWeight] = useState<number | undefined>(undefined);
@@ -33,10 +44,10 @@ export const EdgeForm: React.FC<EdgeFormProps> = ({ onSubmit }) => {
             description,
             weight,
             tag,
-            x: 0,  // initial x position
-            y: 0,  // initial y position
-            vx: 0, // initial x velocity
-            vy: 0  // initial y velocity
+            // x: 0,  // initial x position
+            // y: 0,  // initial y position
+            // vx: 0, // initial x velocity
+            // vy: 0  // initial y velocity
         });
     };
 

@@ -25,14 +25,14 @@ db.run(`CREATE TABLE IF NOT EXISTS Nodes (
 
 // Create the Edges table
 db.run(`CREATE TABLE IF NOT EXISTS Edges (
-    StartNodeID INTEGER,
-    EndNodeID INTEGER,
+    Source INTEGER,
+    Target INTEGER,
     Condition TEXT,
     Description TEXT,
     Weight REAL,
-    FOREIGN KEY(StartNodeID) REFERENCES Nodes(ID),
-    FOREIGN KEY(EndNodeID) REFERENCES Nodes(ID),
-    UNIQUE(StartNodeID, EndNodeID, Condition, Description, Weight)
+    FOREIGN KEY(Source) REFERENCES Nodes(ID),
+    FOREIGN KEY(Target) REFERENCES Nodes(ID),
+    UNIQUE(Source, Target, Condition, Description, Weight)
 )`, (err) => {
     if (err) {
         console.error("Error creating Edges table", err.message);

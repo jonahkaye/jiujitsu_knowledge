@@ -10,7 +10,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       console.log('Connected to the SQLite database.');
     });
 
-    let sql = `INSERT INTO Edges (StartNodeID, EndNodeID, Condition, Description, Weight) VALUES (?, ?, ?, ?, ?)`;
+    let sql = `INSERT INTO Edges (Source, Target, Condition, Description, Weight) VALUES (?, ?, ?, ?, ?)`;
     let params = [req.body.source, req.body.target, req.body.condition, req.body.description, req.body.weight];
 
     db.run(sql, params, function(err) {
